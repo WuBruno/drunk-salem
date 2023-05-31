@@ -6,10 +6,13 @@ export const exampleRouter = createTRPCRouter({
     .input(z.object({ text: z.string() }))
     .query(({ input }) => {
       return {
-        greeting: `Hello ${input.text}`,
+        greeting: `Hello ${input.text} heheheh`,
       };
     }),
   getAll: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.example.findMany();
+  }),
+  getAll2: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany();
   }),
 });
