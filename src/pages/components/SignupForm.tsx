@@ -23,7 +23,7 @@ export const signupFormSchema = z.object({
 });
 
 export type SignupFormProps = {
-  onSubmit: (values: z.infer<typeof signupFormSchema>) => void;
+  onSubmit: (values: z.infer<typeof signupFormSchema>) => Promise<void>;
 };
 
 export function SignupForm({ onSubmit }: SignupFormProps) {
@@ -45,7 +45,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input {...field} />
               </FormControl>
               <FormDescription>
                 This is your public display name.
@@ -54,7 +54,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Register User</Button>
       </form>
     </Form>
   );

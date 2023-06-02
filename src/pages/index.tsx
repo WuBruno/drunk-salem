@@ -1,17 +1,17 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { SignupForm, type signupFormSchema } from "./components/SignupForm";
-import { api } from "@/utils/api";
 import { type z } from "zod";
+import { api } from "@/utils/api";
+import { Button } from "./components/ui/button";
 
 const Home: NextPage = () => {
-  const result = api.example.hello.useQuery({ text: "world222" });
+  const signup = api.user.signup.useMutation();
+  const allUsers = api.user.allUsers.useQuery();
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof signupFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof signupFormSchema>) {
+    await signup.mutateAsync(values);
+    await allUsers.refetch();
   }
 
   return (
@@ -27,7 +27,13 @@ const Home: NextPage = () => {
             Drunk Salem
           </h1>
           <SignupForm onSubmit={onSubmit} />
-          <p>{result.data?.greeting}</p>
+          <div>
+            {allUsers.data?.map((user) => (
+              <Button key={user.id} variant="outline">
+                {user.username}
+              </Button>
+            ))}
+          </div>
         </div>
       </main>
     </>

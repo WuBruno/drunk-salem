@@ -16,3 +16,8 @@ model Example {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+model User {
+    id        String   @id @default(cuid())
+    username String  @unique
+}
