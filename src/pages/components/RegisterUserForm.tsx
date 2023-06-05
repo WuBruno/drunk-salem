@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -23,10 +21,10 @@ export const signupFormSchema = z.object({
 });
 
 export type SignupFormProps = {
-  onSubmit: (values: z.infer<typeof signupFormSchema>) => Promise<void>;
+  onSubmit: (values: z.infer<typeof signupFormSchema>) => void;
 };
 
-export function SignupForm({ onSubmit }: SignupFormProps) {
+export function RegisterUserForm({ onSubmit }: SignupFormProps) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
@@ -37,7 +35,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
           name="username"
@@ -54,7 +52,7 @@ export function SignupForm({ onSubmit }: SignupFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Register User</Button>
+        <Button type="submit">Register</Button>
       </form>
     </Form>
   );

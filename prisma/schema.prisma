@@ -11,13 +11,35 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model User {
+    id        Int   @id @default(autoincrement())
+    username String
+    game Game @relation(fields: [gameId], references: [id])
+    gameId Int
+    alive Boolean @default(true)
+    votes Votes[] @relation("user")
+    targetVotes Votes[] @relation("target")
+    @@unique([username, gameId])
 }
 
-model User {
-    id        String   @id @default(cuid())
-    username String  @unique
+model Game {
+    id        Int   @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    code     Int   @unique
+    users User[]
+    state String @default("LOBBY") // LOBBY, RUNNING, FINISHED
+    day Int @default(1)
+    stage String @default("DAY") // DAY, VOTING, NIGHT
+    votes Votes[]
+}
+
+model Votes {
+    game Game @relation(fields: [gameId], references: [id])
+    gameId Int
+    user User @relation(name: "user",fields: [userId], references: [id])
+    userId Int
+    target User @relation(name: "target", fields: [targetId], references: [id])
+    targetId Int
+    day Int @default(1)
+    @@unique([userId, day, gameId])
 }
