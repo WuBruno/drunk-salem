@@ -31,6 +31,7 @@ model Game {
     day Int @default(1)
     stage String @default("DAY") // DAY, VOTING, NIGHT
     votes Votes[]
+    events Events[]
 }
 
 model Votes {
@@ -42,4 +43,13 @@ model Votes {
     targetId Int
     day Int @default(1)
     @@unique([userId, day, gameId])
+}
+
+model Events {
+    id Int @id @default(autoincrement())
+    game Game @relation(fields: [gameId], references: [id])
+    gameId Int
+    day Int
+    stage String // DAY, VOTING, NIGHT
+    description String
 }

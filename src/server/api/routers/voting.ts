@@ -1,28 +1,29 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { getActiveGame } from "@/server/service";
+import { getActiveGame } from "@/server/service/game";
 import { DAY_STAGES } from "@/constants";
 
 export const votingRouter = createTRPCRouter({
-  getVoteHistory: publicProcedure
-    .input(z.number())
-    .query(async ({ ctx, input }) => {
-      const game = await getActiveGame(ctx.prisma, input);
-
-      return await ctx.prisma.game
-        .findUnique({
-          where: {
-            id: game.id,
-          },
-        })
-        .votes({
-          where: {
-            day: {
-              lt: game.day,
+  getVotesByDay: publicProcedure
+    .input(z.object({ gameId: z.number(), day: z.number() }))
+    .query(({ ctx, input }) =>
+      ctx.prisma.user.findMany({
+        where: {
+          gameId: input.gameId,
+        },
+        include: {
+          votes: {
+            where: {
+              day: input.day,
+              gameId: input.gameId,
+            },
+            include: {
+              target: true,
             },
           },
-        });
-    }),
+        },
+      })
+    ),
   getMyVote: publicProcedure
     .input(z.object({ gameId: z.number(), userId: z.number() }))
     .query(async ({ ctx, input }) => {

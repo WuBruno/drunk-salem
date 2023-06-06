@@ -37,6 +37,7 @@ const Home: NextPage = () => {
     createGame
       .mutateAsync()
       .then((game) => joinGame(game.id, game.code))
+      .then(() => games.refetch())
       .catch(console.error);
   };
 
@@ -45,6 +46,7 @@ const Home: NextPage = () => {
       startGame
         .mutateAsync({ gameId: store.gameId })
         .then(() => game.refetch())
+        .then(() => games.refetch())
         .catch(console.error);
   };
 

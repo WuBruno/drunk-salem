@@ -10,7 +10,7 @@ const GameStatus = () => {
   const nextStage = api.game.processNextStage.useMutation();
 
   return (
-    <Card className="w-[380px]">
+    <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Game Status</CardTitle>
       </CardHeader>

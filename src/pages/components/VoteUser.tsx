@@ -25,7 +25,6 @@ import {
 import { useAuthStore } from "@/store";
 import { useStore } from "zustand";
 import { api } from "@/utils/api";
-import { useEffect } from "react";
 
 const FormSchema = z.object({
   target: z.string(),
@@ -66,6 +65,7 @@ function VoteTargetForm() {
         </pre>
       ),
     });
+    form.reset();
   }
 
   if (myVote.isLoading) {
@@ -118,7 +118,7 @@ function VoteTargetForm() {
 
 const VoteUser = () => {
   return (
-    <Card className="w-[380px]">
+    <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Vote to Hang</CardTitle>
       </CardHeader>
