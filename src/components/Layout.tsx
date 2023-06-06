@@ -1,3 +1,4 @@
+import Head from "next/head";
 import Navbar from "./Navbar";
 import { Toaster } from "./ui/toaster";
 
@@ -8,9 +9,15 @@ export default function RootLayout({
 }) {
   return (
     <>
+      <Head>
+        <title>Drunk Salem</title>
+        <meta name="description" content="Drunk Salem Game" />
+      </Head>
       <Navbar />
       <Toaster />
-      {children}
+      <main className="flex min-h-screen flex-col items-center justify-center">
+        {children}
+      </main>
     </>
   );
 }
