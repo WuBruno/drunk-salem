@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { GAME_STATES } from "@/constants";
 import { toast } from "@/components/ui/use-toast";
+import UserList from "@/components/UserList";
 
 const Home: NextPage = () => {
   const [joinGame, signIn, signOut] = useAuthStore((state) => [
@@ -24,7 +25,11 @@ const Home: NextPage = () => {
   const ctx = api.useContext();
 
   const { mutate: registerUser } = api.user.signup.useMutation({
-    onSuccess: (data) => signIn(data.username, data.id),
+    onSuccess: async (data) => {
+      toast({ title: "Joined Game", description: `Welcome ${data.username}` });
+      signIn(data.username, data.id);
+      return ctx.user.allUsers.invalidate(store?.gameId || 0);
+    },
     onError: (err) =>
       toast({
         title: "Error",
@@ -36,7 +41,7 @@ const Home: NextPage = () => {
     onSuccess: (data) => {
       toast({ title: "New game created", description: `Code: ${data.code}` });
       joinGame(data.id, data.code);
-      return ctx.game.all.invalidate();
+      return ctx.game.all.refetch();
     },
     onError: (err) =>
       toast({
@@ -46,7 +51,10 @@ const Home: NextPage = () => {
       }),
   });
   const { mutate: handleStartGame } = api.game.startGame.useMutation({
-    onSuccess: () => ctx.game.all.invalidate(),
+    onSuccess: () => {
+      toast({ title: "Game started" });
+      return ctx.game.invalidate();
+    },
     onError: (err) =>
       toast({
         title: "Error",
@@ -64,14 +72,14 @@ const Home: NextPage = () => {
   }, [game.data?.state, router, store?.userId]);
 
   return (
-    <div className="container flex flex-col items-center justify-center gap-8 px-4 py-16 ">
+    <div className="container flex flex-col items-center justify-center gap-4 px-4 py-16 ">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
         Drunk Salem
       </h1>
       {!store?.gameId ? (
-        <>
+        <div className="flex flex-col gap-2">
           {games && (
-            <div className="flex flex-col gap-2">
+            <>
               Join existing game:
               {games.data?.map((game) => (
                 <Button
@@ -79,31 +87,38 @@ const Home: NextPage = () => {
                   variant="outline"
                   onClick={() => joinGame(game.id, game.code)}
                 >
-                  {game.code}
+                  <div className="capitalize">
+                    {game.code} – {game.state.toLowerCase()}
+                  </div>
                 </Button>
               ))}
-            </div>
+              <Separator />
+            </>
           )}
           <Button onClick={() => handleCreateGame()}>Create New Game</Button>
-        </>
+        </div>
       ) : (
         <p>Joined game: {store.gameCode}</p>
       )}
       {store?.gameId &&
         (!store.userId ? (
           <div className="flex flex-col gap-5">
-            <RegisterUserForm
-              onSubmit={({ username }) => {
-                store.gameId &&
-                  registerUser({
-                    username,
-                    gameId: store.gameId,
-                  });
-              }}
-            />
-            <Separator />
+            {game.data?.state === GAME_STATES.LOBBY && (
+              <>
+                <RegisterUserForm
+                  onSubmit={({ username }) => {
+                    store.gameId &&
+                      registerUser({
+                        username,
+                        gameId: store.gameId,
+                      });
+                  }}
+                />
+                <Separator />
+              </>
+            )}
             <div className="flex flex-col gap-3">
-              <p>Or sign in as existing user:</p>
+              <p>Sign in as existing user:</p>
               {users.data?.map((user) => (
                 <Button
                   key={user.id}
@@ -113,24 +128,30 @@ const Home: NextPage = () => {
                   {user.username}
                 </Button>
               ))}
+              <Button variant="secondary" onClick={signOut}>
+                Back
+              </Button>
             </div>
           </div>
         ) : (
           <p>Signed in as: {store?.username}</p>
         ))}
       {store?.gameId && store?.userId && (
-        <div className="flex gap-3">
-          <Button
-            onClick={() =>
-              store.gameId && handleStartGame({ gameId: store.gameId })
-            }
-          >
-            Start Game
-          </Button>
-          <Button variant="destructive" onClick={signOut}>
-            Sign Out
-          </Button>
-        </div>
+        <>
+          <UserList gameId={store.gameId} />
+          <div className="flex gap-3">
+            <Button
+              onClick={() =>
+                store.gameId && handleStartGame({ gameId: store.gameId })
+              }
+            >
+              Start Game
+            </Button>
+            <Button variant="destructive" onClick={signOut}>
+              Sign Out
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );

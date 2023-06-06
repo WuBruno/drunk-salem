@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -45,14 +44,13 @@ export default function RegisterUserForm({ onSubmit }: SignupFormProps) {
               <FormControl>
                 <Input {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Register</Button>
+        <Button type="submit" className="float-right">
+          Register
+        </Button>
       </form>
     </Form>
   );

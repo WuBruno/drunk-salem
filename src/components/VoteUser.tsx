@@ -44,7 +44,7 @@ function VoteTargetForm() {
         description: err.message,
         variant: "destructive",
       }),
-    onSuccess: (data) => {
+    onSuccess: () => {
       form.reset();
       toast({
         title: "Vote update",
