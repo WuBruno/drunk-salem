@@ -6,9 +6,9 @@ import RegisterUserForm from "../components/RegisterUserForm";
 import { Separator } from "../components/ui/separator";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { GAME_STATES } from "@/constants";
 import { toast } from "@/components/ui/use-toast";
 import UserList from "@/components/UserList";
+import { GameState } from "@prisma/client";
 
 const Home: NextPage = () => {
   const [joinGame, signIn, signOut] = useAuthStore((state) => [
@@ -66,7 +66,7 @@ const Home: NextPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (store?.userId && game.data?.state === GAME_STATES.RUNNING) {
+    if (store?.userId && game.data?.state === GameState.RUNNING) {
       router.replace("/game").catch(console.error);
     }
   }, [game.data?.state, router, store?.userId]);
@@ -103,7 +103,7 @@ const Home: NextPage = () => {
       {store?.gameId &&
         (!store.userId ? (
           <div className="flex flex-col gap-5">
-            {game.data?.state === GAME_STATES.LOBBY && (
+            {game.data?.state === GameState.LOBBY && (
               <>
                 <RegisterUserForm
                   onSubmit={({ username }) => {

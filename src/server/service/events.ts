@@ -1,5 +1,4 @@
-import { DAY_STAGES } from "@/constants";
-import { type PrismaClient } from "@prisma/client";
+import { DayStage, type PrismaClient } from "@prisma/client";
 
 export const emitHanged = async (
   prisma: PrismaClient,
@@ -17,7 +16,7 @@ export const emitHanged = async (
     data: {
       gameId,
       day,
-      stage: DAY_STAGES.VOTING,
+      stage: DayStage.VOTING,
       description: `${user.username} was hanged`,
     },
   });
@@ -32,7 +31,7 @@ export const emitNoHang = async (
     data: {
       gameId,
       day,
-      stage: DAY_STAGES.VOTING,
+      stage: DayStage.VOTING,
       description: `No one was hanged`,
     },
   });

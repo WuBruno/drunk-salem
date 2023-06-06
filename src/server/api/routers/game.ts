@@ -1,7 +1,7 @@
-import { DAY_STAGES, GAME_STATES } from "@/constants";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { getActiveGame } from "@/server/service/game";
 import { processVotes } from "@/server/service/vote";
+import { DayStage, GameState } from "@prisma/client";
 import { z } from "zod";
 
 const generateCode = () => Math.floor(100000 + Math.random() * 900000);
@@ -30,7 +30,7 @@ export const gameRouter = createTRPCRouter({
     .input(z.object({ gameId: z.number() }))
     .mutation(({ input, ctx }) => {
       return ctx.prisma.game.update({
-        data: { state: GAME_STATES.RUNNING },
+        data: { state: GameState.RUNNING },
         where: { id: input.gameId },
       });
     }),
@@ -41,27 +41,27 @@ export const gameRouter = createTRPCRouter({
       // TODO: Verify if game reached terminal state
 
       switch (game.stage) {
-        case DAY_STAGES.DAY:
+        case DayStage.DAY:
           await ctx.prisma.game.update({
             data: {
-              stage: DAY_STAGES.VOTING,
+              stage: DayStage.VOTING,
             },
             where: { id: input.gameId },
           });
           break;
-        case DAY_STAGES.VOTING:
+        case DayStage.VOTING:
           await processVotes(ctx.prisma, input.gameId, game.day);
           await ctx.prisma.game.update({
             data: {
-              stage: DAY_STAGES.NIGHT,
+              stage: DayStage.VOTING,
             },
             where: { id: input.gameId },
           });
           break;
-        case DAY_STAGES.NIGHT:
+        case DayStage.NIGHT:
           await ctx.prisma.game.update({
             data: {
-              stage: DAY_STAGES.DAY,
+              stage: DayStage.DAY,
               day: {
                 increment: 1,
               },

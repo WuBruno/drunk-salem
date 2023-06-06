@@ -24,14 +24,26 @@ model User {
     @@index([gameId])
 }
 
+enum GameState {
+    LOBBY
+    RUNNING
+    FINISHED
+}
+
+enum DayStage {
+    DAY
+    VOTING
+    NIGHT
+}
+
 model Game {
     id        Int   @id @default(autoincrement())
     createdAt DateTime @default(now())
     code     Int   @unique
     users User[]
-    state String @default("LOBBY") // LOBBY, RUNNING, FINISHED
+    state GameState @default(LOBBY) // LOBBY, RUNNING, FINISHED
     day Int @default(1)
-    stage String @default("DAY") // DAY, VOTING, NIGHT
+    stage DayStage @default(DAY) // DAY, VOTING, NIGHT
     votes Votes[]
     events Events[]
 }
@@ -54,8 +66,7 @@ model Events {
     game Game @relation(fields: [gameId], references: [id])
     gameId Int
     day Int
-    stage String // DAY, VOTING, NIGHT
+    stage DayStage
     description String
-
     @@index([gameId])
 }
