@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "mysql"
     url      = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
 model User {
@@ -20,6 +21,7 @@ model User {
     votes Votes[] @relation("user")
     targetVotes Votes[] @relation("target")
     @@unique([username, gameId])
+    @@index([gameId])
 }
 
 model Game {
@@ -43,6 +45,8 @@ model Votes {
     targetId Int
     day Int @default(1)
     @@unique([userId, day, gameId])
+    @@index([gameId])
+    @@index([targetId])
 }
 
 model Events {
@@ -52,4 +56,6 @@ model Events {
     day Int
     stage String // DAY, VOTING, NIGHT
     description String
+
+    @@index([gameId])
 }
