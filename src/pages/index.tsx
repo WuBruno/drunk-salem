@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useAuthStore, useStore } from "@/store";
 import { api } from "@/utils/api";
 import { Button } from "./components/ui/button";
-import { RegisterUserForm } from "./components/RegisterUserForm";
+import RegisterUserForm from "./components/RegisterUserForm";
 import { Separator } from "./components/ui/separator";
 import { useEffect } from "react";
 import { useRouter } from "next/router";

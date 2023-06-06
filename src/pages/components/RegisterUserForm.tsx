@@ -24,7 +24,7 @@ export type SignupFormProps = {
   onSubmit: (values: z.infer<typeof signupFormSchema>) => void;
 };
 
-export function RegisterUserForm({ onSubmit }: SignupFormProps) {
+export default function RegisterUserForm({ onSubmit }: SignupFormProps) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
