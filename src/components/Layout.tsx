@@ -1,4 +1,5 @@
 import Navbar from "./Navbar";
+import { Toaster } from "./ui/toaster";
 
 export default function RootLayout({
   children,
@@ -8,6 +9,7 @@ export default function RootLayout({
   return (
     <>
       <Navbar />
+      <Toaster />
       {children}
     </>
   );

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { getActiveGame } from "@/server/service/game";
 import { DAY_STAGES } from "@/constants";
+import { TRPCError } from "@trpc/server";
 
 export const votingRouter = createTRPCRouter({
   getVotesByDay: publicProcedure
@@ -49,7 +50,10 @@ export const votingRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
       if (game.stage === DAY_STAGES.NIGHT) {
-        throw new Error("Game is in night stage");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Game is in night stage",
+        });
       }
 
       await ctx.prisma.votes.upsert({
@@ -81,7 +85,10 @@ export const votingRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
       if (game.stage === DAY_STAGES.NIGHT) {
-        throw new Error("Game is in night stage");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Game is in night stage",
+        });
       }
 
       await ctx.prisma.votes.delete({

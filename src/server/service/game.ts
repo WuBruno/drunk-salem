@@ -1,5 +1,6 @@
 import { GAME_STATES } from "@/constants";
 import { type PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const getActiveGame = async (prisma: PrismaClient, gameId: number) => {
   const game = await prisma.game.findFirstOrThrow({
@@ -7,7 +8,10 @@ export const getActiveGame = async (prisma: PrismaClient, gameId: number) => {
   });
 
   if (game.state !== GAME_STATES.RUNNING) {
-    throw new Error("Game is not running");
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Game is not running",
+    });
   }
   return game;
 };

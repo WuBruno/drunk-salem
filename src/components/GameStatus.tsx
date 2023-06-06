@@ -3,11 +3,24 @@ import { useAuthStore } from "@/store";
 import { api } from "@/utils/api";
 import { useStore } from "zustand";
 import { Button } from "./ui/button";
+import { toast } from "./ui/use-toast";
 
 const GameStatus = () => {
   const store = useStore(useAuthStore, (state) => state);
   const game = api.game.one.useQuery(store?.gameId || 0);
-  const nextStage = api.game.processNextStage.useMutation();
+  const ctx = api.useContext();
+  const { mutate: processNextStage } = api.game.processNextStage.useMutation({
+    onSuccess: async () => {
+      toast({ title: "Success", description: "Next stage processed" });
+      return ctx.game.one.invalidate();
+    },
+    onError: (err) =>
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      }),
+  });
 
   return (
     <Card className="w-[350px]">
@@ -25,12 +38,7 @@ const GameStatus = () => {
           Code: <b>{game.data?.code}</b>
         </div>
         <Button
-          onClick={() => {
-            nextStage
-              .mutateAsync({ gameId: game.data?.id || 0 })
-              .then(() => game.refetch())
-              .catch(console.error);
-          }}
+          onClick={() => processNextStage({ gameId: game.data?.id || 0 })}
         >
           Next Stage
         </Button>

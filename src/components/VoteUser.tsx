@@ -37,35 +37,54 @@ function VoteTargetForm() {
     gameId: store?.gameId || 0,
     userId: store?.userId || 0,
   });
-  const vote = api.vote.vote.useMutation();
-  const clearVote = api.vote.clearVote.useMutation();
+  const vote = api.vote.vote.useMutation({
+    onError: (err) =>
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      }),
+    onSuccess: (data) => {
+      form.reset();
+      toast({
+        title: "Vote update",
+        description: "Vote submitted",
+      });
+    },
+  });
+  const clearVote = api.vote.clearVote.useMutation({
+    onError: (err) =>
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      }),
+    onSuccess: () => {
+      form.reset();
+      toast({
+        title: "Vote has been cleared",
+        description: "vote abstained",
+      });
+    },
+  });
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: z.infer<typeof FormSchema>) {
     if (data.target === "0") {
-      await clearVote.mutateAsync({
+      clearVote.mutate({
         gameId: store.gameId || 0,
         userId: store.userId || 0,
       });
     } else {
-      await vote.mutateAsync({
+      vote.mutate({
         targetUserId: Number(data.target),
         gameId: store?.gameId || 0,
         userId: store?.userId || 0,
       });
     }
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-    form.reset();
   }
 
   if (myVote.isLoading) {
