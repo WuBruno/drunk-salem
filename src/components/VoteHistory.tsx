@@ -7,7 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "@/pages/components/ui/accordion";
+} from "@/components/ui/accordion";
 import {
   Table,
   TableHeader,

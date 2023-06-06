@@ -2,22 +2,17 @@ import { useAuthStore } from "@/store";
 import { api } from "@/utils/api";
 import { type NextPage } from "next";
 import { useStore } from "zustand";
-import GameStatus from "../components/GameStatus";
-import VoteUser from "../components/VoteUser";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/pages/components/ui/tabs";
+import GameStatus from "../../components/GameStatus";
+import VoteUser from "../../components/VoteUser";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-} from "../components/ui/card";
-import VoteHistory from "../components/VoteHistory";
-import EventHistory from "../components/EventHistory";
+} from "../../components/ui/card";
+import VoteHistory from "../../components/VoteHistory";
+import EventHistory from "../../components/EventHistory";
 
 const Main: NextPage = () => {
   const store = useStore(useAuthStore, (state) => state);

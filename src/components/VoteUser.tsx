@@ -5,15 +5,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button } from "@/pages/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/pages/components/ui/select";
-import { toast } from "@/pages/components/ui/use-toast";
+} from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -21,7 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/pages/components/ui/form";
+} from "@/components/ui/form";
 import { useAuthStore } from "@/store";
 import { useStore } from "zustand";
 import { api } from "@/utils/api";

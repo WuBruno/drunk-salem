@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/pages/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -11,8 +11,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/pages/components/ui/form";
-import { Input } from "@/pages/components/ui/input";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 export const signupFormSchema = z.object({
   username: z.string().min(2, {
