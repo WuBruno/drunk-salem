@@ -16,6 +16,7 @@ import EventHistory from "../../components/EventHistory";
 import MafiaTargetForm from "@/components/MafiaKill";
 import { DayStage, Role } from "@prisma/client";
 import DoctorForm from "@/components/Doctor";
+import DetectiveForm from "@/components/Detective";
 
 const Main: NextPage = () => {
   const store = useStore(useAuthStore, (state) => state);
@@ -50,6 +51,7 @@ const Main: NextPage = () => {
           {game.data?.stage !== DayStage.NIGHT && <VoteUser />}
           {user.data?.roleId === Role.MAFIA_KILLING && <MafiaTargetForm />}
           {user.data?.roleId === Role.DOCTOR && <DoctorForm />}
+          {user.data?.roleId === Role.DETECTIVE && <DetectiveForm />}
           <EventHistory />
         </TabsContent>
         <TabsContent value="votes">

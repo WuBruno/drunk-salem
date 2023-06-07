@@ -1,8 +1,10 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
   emitHealAction,
+  emitInvestigateAction,
   emitKillAction,
   removeHealAction,
+  removeInvestigateAction,
   removeKillAction,
 } from "@/server/service/actions";
 import { getActiveGame } from "@/server/service/game";
@@ -106,7 +108,7 @@ export const actionsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
-      await emitHealAction(
+      await emitInvestigateAction(
         ctx.prisma,
         input.gameId,
         game.day,
@@ -124,7 +126,7 @@ export const actionsRouter = createTRPCRouter({
           day_gameId_type: {
             day: game.day,
             gameId: input.gameId,
-            type: ActionTypes.HEAL,
+            type: ActionTypes.INVESTIGATE,
           },
         },
       });
@@ -137,6 +139,6 @@ export const actionsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
-      await removeHealAction(ctx.prisma, input.gameId, game.day);
+      await removeInvestigateAction(ctx.prisma, input.gameId, game.day);
     }),
 });
