@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { resolveInvestigation, resolveKilled } from "@/server/service/actions";
 import { getActiveGame } from "@/server/service/game";
-import { assignRoles } from "@/server/service/roles";
+import { assignRoles, shuffleMafiaKilling } from "@/server/service/roles";
 import { processVotes } from "@/server/service/vote";
 import { DayStage, GameState } from "@prisma/client";
 import { z } from "zod";
@@ -72,6 +72,7 @@ export const gameRouter = createTRPCRouter({
             },
             where: { id: input.gameId },
           });
+          await shuffleMafiaKilling(ctx.prisma, input.gameId);
           break;
 
         default:

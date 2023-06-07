@@ -1,4 +1,4 @@
-import { Role, type PrismaClient } from "@prisma/client";
+import { Role, type PrismaClient, Team } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 
 const MAFIA_ACTIVE_ROLES = {
@@ -98,4 +98,47 @@ export const assignRoles = async (prisma: PrismaClient, gameId: number) => {
       })
     )
   );
+};
+
+function randomNumber(max: number) {
+  // min and max included
+  return Math.floor(Math.random() * (max + 1));
+}
+
+export const shuffleMafiaKilling = async (
+  prisma: PrismaClient,
+  gameId: number
+) => {
+  const users = await prisma.user.findMany({
+    where: {
+      role: {
+        team: Team.MAFIA,
+      },
+      gameId: gameId,
+    },
+  });
+
+  if (!users) {
+    throw new TRPCClientError("No mafia players found for game");
+  }
+
+  // Remove current mafia killing
+  await prisma.user.updateMany({
+    where: {
+      roleId: Role.MAFIA_KILLING,
+    },
+    data: {
+      roleId: Role.MAFIA,
+    },
+  });
+
+  const nextMafiaKilling = users[randomNumber(users.length - 1)];
+  return prisma.user.update({
+    where: {
+      id: nextMafiaKilling?.id,
+    },
+    data: {
+      roleId: Role.MAFIA_KILLING,
+    },
+  });
 };
