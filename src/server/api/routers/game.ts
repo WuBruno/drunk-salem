@@ -1,5 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { resolveKilled } from "@/server/service/actions";
 import { getActiveGame } from "@/server/service/game";
+import { assignRoles } from "@/server/service/roles";
 import { processVotes } from "@/server/service/vote";
 import { DayStage, GameState } from "@prisma/client";
 import { z } from "zod";
@@ -28,7 +30,8 @@ export const gameRouter = createTRPCRouter({
   }),
   startGame: publicProcedure
     .input(z.object({ gameId: z.number() }))
-    .mutation(({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
+      await assignRoles(ctx.prisma, input.gameId);
       return ctx.prisma.game.update({
         data: { state: GameState.RUNNING },
         where: { id: input.gameId },
@@ -38,7 +41,6 @@ export const gameRouter = createTRPCRouter({
     .input(z.object({ gameId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
-      // TODO: Verify if game reached terminal state
 
       switch (game.stage) {
         case DayStage.DAY:
@@ -59,6 +61,7 @@ export const gameRouter = createTRPCRouter({
           });
           break;
         case DayStage.NIGHT:
+          await resolveKilled(ctx.prisma, input.gameId, game.day);
           await ctx.prisma.game.update({
             data: {
               stage: DayStage.DAY,
@@ -73,5 +76,8 @@ export const gameRouter = createTRPCRouter({
         default:
           break;
       }
+      // TODO: Verify if game reached terminal state
+      // If no mafia alive
+      // If less mafia than town alive
     }),
 });

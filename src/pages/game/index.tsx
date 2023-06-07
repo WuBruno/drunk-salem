@@ -36,7 +36,9 @@ const Main: NextPage = () => {
             </CardHeader>
             <CardContent className="grid gap-4">
               {users.data?.map((user) => (
-                <p key={user.id}>{user.username}</p>
+                <p key={user.id}>
+                  {user.username} - {user.roleId?.toLowerCase()}
+                </p>
               ))}
             </CardContent>
           </Card>

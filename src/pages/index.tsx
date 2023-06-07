@@ -78,7 +78,7 @@ const Home: NextPage = () => {
       </h1>
       {!store?.gameId ? (
         <div className="flex flex-col gap-2">
-          {games && (
+          {games.data && games.data.length > 0 && (
             <>
               Join existing game:
               {games.data?.map((game) => (

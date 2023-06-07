@@ -20,8 +20,33 @@ model User {
     alive Boolean @default(true)
     votes Votes[] @relation("user")
     targetVotes Votes[] @relation("target")
+    userMoves Actions[] @relation("moveUser")
+    targetMoves Actions[] @relation("moveTarget")
+    events Events[]
+    role Roles? @relation(fields: [roleId], references: [role])
+    roleId Role?
     @@unique([username, gameId])
     @@index([gameId])
+    @@index([roleId])
+}
+
+model Roles {
+    role Role @id
+    team Team
+    users User[]
+}
+
+enum Role {
+    MAFIA_KILLING
+    MAFIA
+    DETECTIVE
+    DOCTOR
+    TOWNSPERSON
+}
+
+enum Team {
+    MAFIA
+    TOWN
 }
 
 enum GameState {
@@ -41,6 +66,7 @@ model Game {
     createdAt DateTime @default(now())
     code     Int   @unique
     users User[]
+    moves Actions[]
     state GameState @default(LOBBY) // LOBBY, RUNNING, FINISHED
     day Int @default(1)
     stage DayStage @default(DAY) // DAY, VOTING, NIGHT
@@ -61,12 +87,44 @@ model Votes {
     @@index([targetId])
 }
 
+enum EventType {
+    KILLED
+    HUNG
+    ANNOUNCEMENT
+}
+
 model Events {
     id Int @id @default(autoincrement())
     game Game @relation(fields: [gameId], references: [id])
     gameId Int
     day Int
     stage DayStage
+    targetId Int?
+    target User? @relation(fields: [targetId], references: [id])
+    type EventType
     description String
     @@index([gameId])
+    @@index([targetId])
+}
+
+
+enum ActionTypes {
+    KILL
+    HEAL
+}
+model Actions {
+    id Int @id @default(autoincrement())
+    game Game @relation(fields: [gameId], references: [id])
+    gameId Int
+    day Int
+    stage DayStage
+    userId Int
+    user User @relation("moveUser", fields: [userId], references: [id])
+    targetId Int
+    target User @relation("moveTarget", fields: [targetId], references: [id])
+    type ActionTypes
+    @@unique([day, gameId, type])
+    @@index([gameId])
+    @@index([targetId])
+    @@index([userId])
 }

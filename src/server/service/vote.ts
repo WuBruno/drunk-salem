@@ -1,5 +1,6 @@
 import { type PrismaClient } from "@prisma/client";
 import { emitHanged, emitNoHang } from "./events";
+import { applyDeath } from "./user";
 
 const hangPlayer = async (
   prisma: PrismaClient,
@@ -8,14 +9,7 @@ const hangPlayer = async (
   userId: number
 ) => {
   await emitHanged(prisma, gameId, day, userId);
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      alive: false,
-    },
-  });
+  await applyDeath(prisma, userId);
 };
 
 export const processVotes = async (
