@@ -1,5 +1,5 @@
 import { type PrismaClient } from "@prisma/client";
-import { emitHanged, emitNoHang } from "./events";
+import { emitHangedEvent, emitNoHang } from "./events";
 import { applyDeath } from "./user";
 
 const hangPlayer = async (
@@ -8,7 +8,7 @@ const hangPlayer = async (
   day: number,
   userId: number
 ) => {
-  await emitHanged(prisma, gameId, day, userId);
+  await emitHangedEvent(prisma, gameId, day, userId);
   await applyDeath(prisma, userId);
 };
 

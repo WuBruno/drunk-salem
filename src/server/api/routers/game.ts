@@ -1,5 +1,5 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { resolveKilled } from "@/server/service/actions";
+import { resolveInvestigation, resolveKilled } from "@/server/service/actions";
 import { getActiveGame } from "@/server/service/game";
 import { assignRoles } from "@/server/service/roles";
 import { processVotes } from "@/server/service/vote";
@@ -62,6 +62,7 @@ export const gameRouter = createTRPCRouter({
           break;
         case DayStage.NIGHT:
           await resolveKilled(ctx.prisma, input.gameId, game.day);
+          await resolveInvestigation(ctx.prisma, input.gameId, game.day);
           await ctx.prisma.game.update({
             data: {
               stage: DayStage.DAY,

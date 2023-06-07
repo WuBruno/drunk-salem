@@ -91,6 +91,7 @@ enum EventType {
     KILLED
     HUNG
     ANNOUNCEMENT
+    INVESTIGATED
 }
 
 model Events {
@@ -111,6 +112,7 @@ model Events {
 enum ActionTypes {
     KILL
     HEAL
+    INVESTIGATE
 }
 model Actions {
     id Int @id @default(autoincrement())

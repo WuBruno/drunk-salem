@@ -1,5 +1,5 @@
 import { type PrismaClient, DayStage, ActionTypes } from "@prisma/client";
-import { emitKilled } from "./events";
+import { emitInvestigatedEvent, emitKilledEvent } from "./events";
 import { applyDeath } from "./user";
 
 export const resolveKilled = async (
@@ -36,11 +36,52 @@ export const resolveKilled = async (
     return;
   }
 
-  await emitKilled(prisma, gameId, day, killAction.targetId);
+  const investigateAction = await prisma.actions.findUnique({
+    where: {
+      day_gameId_type: {
+        gameId,
+        day,
+        type: ActionTypes.INVESTIGATE,
+      },
+    },
+  });
+
+  // Also kill investigator if they investigated the killed
+  if (investigateAction?.targetId === killAction.targetId) {
+    await emitKilledEvent(prisma, gameId, day, investigateAction.userId);
+    await applyDeath(prisma, killAction.targetId);
+  }
+
+  await emitKilledEvent(prisma, gameId, day, killAction.targetId);
   await applyDeath(prisma, killAction.targetId);
 };
 
-export const emitKill = async (
+export const resolveInvestigation = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number
+) => {
+  const investigateAction = await prisma.actions.findUnique({
+    where: {
+      day_gameId_type: {
+        gameId,
+        day,
+        type: ActionTypes.INVESTIGATE,
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  if (!investigateAction || !investigateAction.user.alive) {
+    return; // No investigation or investigator is dead
+  }
+
+  await emitInvestigatedEvent(prisma, gameId, day, investigateAction.targetId);
+};
+
+export const emitKillAction = async (
   prisma: PrismaClient,
   gameId: number,
   day: number,
@@ -68,7 +109,7 @@ export const emitKill = async (
     },
   });
 
-export const removeKill = async (
+export const removeKillAction = async (
   prisma: PrismaClient,
   gameId: number,
   day: number
@@ -83,7 +124,7 @@ export const removeKill = async (
     },
   });
 
-export const emitHeal = async (
+export const emitHealAction = async (
   prisma: PrismaClient,
   gameId: number,
   day: number,
@@ -111,7 +152,7 @@ export const emitHeal = async (
     },
   });
 
-export const removeHeal = async (
+export const removeHealAction = async (
   prisma: PrismaClient,
   gameId: number,
   day: number
@@ -122,6 +163,49 @@ export const removeHeal = async (
         day,
         gameId,
         type: ActionTypes.HEAL,
+      },
+    },
+  });
+
+export const emitInvestigateAction = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number,
+  userId: number,
+  targetId: number
+) =>
+  prisma.actions.upsert({
+    where: {
+      day_gameId_type: {
+        day,
+        gameId,
+        type: ActionTypes.INVESTIGATE,
+      },
+    },
+    create: {
+      userId,
+      day,
+      gameId,
+      type: ActionTypes.INVESTIGATE,
+      stage: DayStage.NIGHT,
+      targetId,
+    },
+    update: {
+      targetId,
+    },
+  });
+
+export const removeInvestigateAction = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number
+) =>
+  prisma.actions.delete({
+    where: {
+      day_gameId_type: {
+        day,
+        gameId,
+        type: ActionTypes.INVESTIGATE,
       },
     },
   });
