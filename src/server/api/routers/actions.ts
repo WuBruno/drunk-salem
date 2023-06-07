@@ -1,5 +1,10 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { emitHeal, emitKill } from "@/server/service/actions";
+import {
+  emitHeal,
+  emitKill,
+  removeHeal,
+  removeKill,
+} from "@/server/service/actions";
 import { getActiveGame } from "@/server/service/game";
 import { ActionTypes } from "@prisma/client";
 import { z } from "zod";
@@ -30,13 +35,23 @@ export const actionsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
-      await emitKill(
+      return emitKill(
         ctx.prisma,
         input.gameId,
         game.day,
         input.userId,
         input.targetId
       );
+    }),
+  removeKill: publicProcedure
+    .input(
+      z.object({
+        gameId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const game = await getActiveGame(ctx.prisma, input.gameId);
+      await removeKill(ctx.prisma, input.gameId, game.day);
     }),
   heal: publicProcedure
     .input(
@@ -70,5 +85,15 @@ export const actionsRouter = createTRPCRouter({
           },
         },
       });
+    }),
+  removeHeal: publicProcedure
+    .input(
+      z.object({
+        gameId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const game = await getActiveGame(ctx.prisma, input.gameId);
+      await removeHeal(ctx.prisma, input.gameId, game.day);
     }),
 });

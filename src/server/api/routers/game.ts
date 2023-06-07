@@ -55,7 +55,7 @@ export const gameRouter = createTRPCRouter({
           await processVotes(ctx.prisma, input.gameId, game.day);
           await ctx.prisma.game.update({
             data: {
-              stage: DayStage.VOTING,
+              stage: DayStage.NIGHT,
             },
             where: { id: input.gameId },
           });

@@ -9,6 +9,11 @@ export const userRouter = createTRPCRouter({
         data: { username: input.username, gameId: input.gameId },
       });
     }),
+  user: publicProcedure.input(z.number()).query(({ input, ctx }) => {
+    return ctx.prisma.user.findUnique({
+      where: { id: input },
+    });
+  }),
   allUsers: publicProcedure.input(z.number()).query(({ input, ctx }) => {
     return ctx.prisma.user.findMany({
       where: { gameId: input },

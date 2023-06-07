@@ -68,6 +68,21 @@ export const emitKill = async (
     },
   });
 
+export const removeKill = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number
+) =>
+  prisma.actions.delete({
+    where: {
+      day_gameId_type: {
+        day,
+        gameId,
+        type: ActionTypes.KILL,
+      },
+    },
+  });
+
 export const emitHeal = async (
   prisma: PrismaClient,
   gameId: number,
@@ -93,5 +108,20 @@ export const emitHeal = async (
     },
     update: {
       targetId,
+    },
+  });
+
+export const removeHeal = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number
+) =>
+  prisma.actions.delete({
+    where: {
+      day_gameId_type: {
+        day,
+        gameId,
+        type: ActionTypes.HEAL,
+      },
     },
   });

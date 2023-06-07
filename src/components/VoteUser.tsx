@@ -93,43 +93,45 @@ function VoteTargetForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="target"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Select Target:</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                defaultValue={myVote.data?.targetId.toString() || "0"}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem key={0} value={"0"}>
-                    Abstain
-                  </SelectItem>
-                  {targets.data
-                    ?.filter((user) => user.id !== store.userId)
-                    .map((user) => (
-                      <SelectItem key={user.id} value={user.id.toString()}>
-                        {user.username}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={!form.formState.isDirty}>
-          Update
-        </Button>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <fieldset className="space-y-6">
+          <FormField
+            control={form.control}
+            name="target"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Target:</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={myVote.data?.targetId.toString() || "0"}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem key={0} value={"0"}>
+                      Abstain
+                    </SelectItem>
+                    {targets.data
+                      ?.filter((user) => user.id !== store.userId)
+                      .map((user) => (
+                        <SelectItem key={user.id} value={user.id.toString()}>
+                          {user.username}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" disabled={!form.formState.isDirty}>
+            Update
+          </Button>
+        </fieldset>
       </form>
     </Form>
   );

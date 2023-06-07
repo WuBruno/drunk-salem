@@ -13,10 +13,15 @@ import {
 } from "../../components/ui/card";
 import VoteHistory from "../../components/VoteHistory";
 import EventHistory from "../../components/EventHistory";
+import MafiaTargetForm from "@/components/MafiaKill";
+import { DayStage, Role } from "@prisma/client";
+import DoctorForm from "@/components/Doctor";
 
 const Main: NextPage = () => {
   const store = useStore(useAuthStore, (state) => state);
   const users = api.user.alive.useQuery(store?.gameId || 0);
+  const user = api.user.user.useQuery(store?.userId || 0);
+  const game = api.game.one.useQuery(store?.gameId || 0);
 
   return (
     <div className="container flex flex-col items-center gap-7 px-4 py-10 ">
@@ -42,7 +47,9 @@ const Main: NextPage = () => {
               ))}
             </CardContent>
           </Card>
-          <VoteUser />
+          {game.data?.stage !== DayStage.NIGHT && <VoteUser />}
+          {user.data?.roleId === Role.MAFIA_KILLING && <MafiaTargetForm />}
+          {user.data?.roleId === Role.DOCTOR && <DoctorForm />}
           <EventHistory />
         </TabsContent>
         <TabsContent value="votes">
