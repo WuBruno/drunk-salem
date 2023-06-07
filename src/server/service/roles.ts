@@ -102,7 +102,7 @@ export const assignRoles = async (prisma: PrismaClient, gameId: number) => {
 
 function randomNumber(max: number) {
   // min and max included
-  return Math.floor(Math.random() * (max + 1));
+  return Math.floor(Math.random() * max);
 }
 
 export const shuffleMafiaKilling = async (
@@ -132,7 +132,7 @@ export const shuffleMafiaKilling = async (
     },
   });
 
-  const nextMafiaKilling = users[randomNumber(users.length - 1)];
+  const nextMafiaKilling = users[randomNumber(users.length)];
   return prisma.user.update({
     where: {
       id: nextMafiaKilling?.id,
