@@ -37,7 +37,6 @@ export const resolveKilled = async (prisma: PrismaClient, game: Game) => {
   });
 
   if (heal && heal.targetId === killAction.targetId) {
-    // TODO: Issue drink to killer
     return emitSavedEvent(
       prisma,
       game.id,

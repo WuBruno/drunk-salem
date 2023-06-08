@@ -1,0 +1,9 @@
+export function shuffle<T>(array: T[]): T[] {
+  return [...array]
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
+}
+
+export const zip = <T, S>(a: T[], b: S[]) =>
+  a.map((k, i) => [k, b[i]]) as [T, S][];

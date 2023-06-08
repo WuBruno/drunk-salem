@@ -6,6 +6,8 @@ import {
   Team,
 } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
+import { getUsersAlive } from "./user";
+import { zip } from "../utils";
 
 const DRINK_DISTRIBUTIONS = {
   INVESTIGATE: 1,
@@ -15,6 +17,7 @@ const DRINK_DISTRIBUTIONS = {
   KILL: 1,
   HEALED: 1,
   HEAL: 1,
+  RANDOM: 1,
 };
 
 const getEventsForDrinks = async (prisma: PrismaClient, game: Game) => {
@@ -129,6 +132,59 @@ export const resolveDrink = async (
   }
   return;
 };
+
+export const randomAssignDrinks = async (prisma: PrismaClient, game: Game) => {
+  const users = await getUsersAlive(prisma, game.id);
+  const drinkProportion = Math.floor(users.length / 2);
+  const nonDrinkProportion = users.length - drinkProportion;
+
+  const drinks = [
+    ...Array<boolean>(drinkProportion).fill(true),
+    ...Array<boolean>(nonDrinkProportion).fill(false),
+  ];
+
+  return Promise.all(
+    zip(users, drinks)
+      .filter(([_, drink]) => drink)
+      .map(([user]) =>
+        incrementDrinkWithoutEvent(
+          prisma,
+          game,
+          user.id,
+          DRINK_DISTRIBUTIONS.RANDOM
+        )
+      )
+  );
+};
+
+export const incrementDrinkWithoutEvent = async (
+  prisma: PrismaClient,
+  game: Game,
+  targetId: number,
+  amount: number
+) =>
+  prisma.drinks.upsert({
+    where: {
+      day_stage_gameId_targetId: {
+        day: game.day,
+        stage: game.stage,
+        gameId: game.id,
+        targetId,
+      },
+    },
+    update: {
+      amount: {
+        increment: amount,
+      },
+    },
+    create: {
+      day: game.day,
+      stage: game.stage,
+      gameId: game.id,
+      targetId,
+      amount,
+    },
+  });
 
 export const incrementDrink = async (
   prisma: PrismaClient,

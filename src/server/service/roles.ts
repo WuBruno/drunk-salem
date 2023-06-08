@@ -1,5 +1,6 @@
 import { Role, type PrismaClient, Team } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
+import { shuffle, zip } from "../utils";
 
 const MAFIA_ACTIVE_ROLES = {
   [Role.MAFIA_KILLING]: 1,
@@ -48,15 +49,6 @@ const getTownRoles = (totalUsers: number) => {
     ),
   ];
 };
-
-function shuffle<T>(array: T[]): T[] {
-  return [...array]
-    .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
-}
-
-const zip = <T, S>(a: T[], b: S[]) => a.map((k, i) => [k, b[i]]) as [T, S][];
 
 export const assignRoles = async (prisma: PrismaClient, gameId: number) => {
   const users = await prisma.game

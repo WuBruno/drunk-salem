@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { getUsersAlive } from "@/server/service/user";
 
 export const userRouter = createTRPCRouter({
   signup: publicProcedure
@@ -20,9 +21,7 @@ export const userRouter = createTRPCRouter({
       orderBy: { alive: "desc" },
     });
   }),
-  alive: publicProcedure.input(z.number()).query(({ input, ctx }) => {
-    return ctx.prisma.user.findMany({
-      where: { gameId: input, alive: true },
-    });
-  }),
+  alive: publicProcedure
+    .input(z.number())
+    .query(({ input, ctx }) => getUsersAlive(ctx.prisma, input)),
 });

@@ -9,3 +9,11 @@ export const applyDeath = async (prisma: PrismaClient, userId: number) =>
       alive: false,
     },
   });
+
+export const getUsersAlive = async (prisma: PrismaClient, gameId: number) =>
+  prisma.user.findMany({
+    where: {
+      gameId,
+      alive: true,
+    },
+  });

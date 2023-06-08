@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { resolveInvestigation, resolveKilled } from "@/server/service/actions";
-import { resolveDrinks } from "@/server/service/drinks";
+import { randomAssignDrinks, resolveDrinks } from "@/server/service/drinks";
 import { getActiveGame } from "@/server/service/game";
 import { assignRoles, shuffleMafiaKilling } from "@/server/service/roles";
 import { processVotes } from "@/server/service/vote";
@@ -66,6 +66,8 @@ export const gameRouter = createTRPCRouter({
           await resolveKilled(ctx.prisma, game);
           await resolveInvestigation(ctx.prisma, game);
           await resolveDrinks(ctx.prisma, game);
+
+          await randomAssignDrinks(ctx.prisma, game);
           await ctx.prisma.game.update({
             data: {
               stage: DayStage.DAY,
