@@ -1,4 +1,10 @@
-import { DayStage, EventType, type PrismaClient } from "@prisma/client";
+import {
+  DayStage,
+  EventType,
+  type Game,
+  type GameOutcome,
+  type PrismaClient,
+} from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 
 export const emitKilledEvent = async (
@@ -154,4 +160,19 @@ export const emitSavedEvent = async (
   });
 
   return connectActionToEvent(prisma, event.id, [healActionId, killActionId]);
+};
+
+export const emitGameOutcome = async (prisma: PrismaClient, game: Game) => {
+  if (!game.outcome) {
+    throw new TRPCClientError("Game has not ended");
+  }
+  return prisma.events.create({
+    data: {
+      gameId: game.id,
+      day: game.day,
+      stage: game.stage,
+      description: `Game ended, ${game.outcome} won`,
+      type: EventType.ANNOUNCEMENT,
+    },
+  });
 };

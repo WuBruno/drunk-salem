@@ -7,6 +7,9 @@ export const eventsRouter = createTRPCRouter({
       where: {
         gameId: input,
       },
+      orderBy: {
+        id: "desc",
+      },
     });
   }),
 });

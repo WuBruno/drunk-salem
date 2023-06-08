@@ -32,6 +32,7 @@
     "clsx": "^1.2.1",
     "lucide-react": "^0.227.0",
     "next": "^13.4.2",
+    "radix-ui": "^1.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.44.2",

@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { resolveInvestigation, resolveKilled } from "@/server/service/actions";
 import { randomAssignDrinks, resolveDrinks } from "@/server/service/drinks";
-import { getActiveGame } from "@/server/service/game";
+import { getActiveGame, resolveGameEnd } from "@/server/service/game";
 import { assignRoles, shuffleMafiaKilling } from "@/server/service/roles";
 import { processVotes } from "@/server/service/vote";
 import { DayStage, GameState } from "@prisma/client";
@@ -83,8 +83,7 @@ export const gameRouter = createTRPCRouter({
         default:
           break;
       }
-      // TODO: Verify if game reached terminal state
-      // If no mafia alive
-      // If less mafia than town alive
+
+      await resolveGameEnd(ctx.prisma, game);
     }),
 });

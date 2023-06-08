@@ -64,6 +64,11 @@ enum DayStage {
     NIGHT
 }
 
+enum GameOutcome {
+    MAFIA
+    TOWN
+}
+
 model Game {
     id        Int   @id @default(autoincrement())
     createdAt DateTime @default(now())
@@ -76,6 +81,7 @@ model Game {
     votes Votes[]
     events Events[]
     drinks Drinks[]
+    outcome GameOutcome?
 }
 
 model Votes {

@@ -9,6 +9,9 @@ export const drinksRouter = createTRPCRouter({
         where: {
           gameId: input.gameId,
         },
+        orderBy: {
+          id: "desc",
+        },
         include: {
           target: true,
         },
