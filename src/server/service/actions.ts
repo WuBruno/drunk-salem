@@ -107,7 +107,7 @@ export const resolveInvestigation = async (
     game.id,
     game.day,
     investigateAction.targetId,
-    investigateAction.targetId
+    investigateAction.id
   );
 };
 
