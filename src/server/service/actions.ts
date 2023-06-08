@@ -1,17 +1,22 @@
-import { type PrismaClient, DayStage, ActionTypes } from "@prisma/client";
-import { emitInvestigatedEvent, emitKilledEvent } from "./events";
+import {
+  type PrismaClient,
+  DayStage,
+  ActionTypes,
+  type Game,
+} from "@prisma/client";
+import {
+  emitInvestigatedEvent,
+  emitKilledEvent,
+  emitSavedEvent,
+} from "./events";
 import { applyDeath } from "./user";
 
-export const resolveKilled = async (
-  prisma: PrismaClient,
-  gameId: number,
-  day: number
-) => {
+export const resolveKilled = async (prisma: PrismaClient, game: Game) => {
   const killAction = await prisma.actions.findUnique({
     where: {
       day_gameId_type: {
-        gameId,
-        day,
+        gameId: game.id,
+        day: game.day,
         type: ActionTypes.KILL,
       },
     },
@@ -24,8 +29,8 @@ export const resolveKilled = async (
   const heal = await prisma.actions.findUnique({
     where: {
       day_gameId_type: {
-        gameId,
-        day,
+        gameId: game.id,
+        day: game.day,
         type: ActionTypes.HEAL,
       },
     },
@@ -33,14 +38,21 @@ export const resolveKilled = async (
 
   if (heal && heal.targetId === killAction.targetId) {
     // TODO: Issue drink to killer
-    return;
+    return emitSavedEvent(
+      prisma,
+      game.id,
+      game.day,
+      heal.userId,
+      heal.id,
+      killAction.id
+    );
   }
 
   const investigateAction = await prisma.actions.findUnique({
     where: {
       day_gameId_type: {
-        gameId,
-        day,
+        gameId: game.id,
+        day: game.day,
         type: ActionTypes.INVESTIGATE,
       },
     },
@@ -48,24 +60,36 @@ export const resolveKilled = async (
 
   // Also kill investigator if they investigated the killed
   if (investigateAction?.targetId === killAction.targetId) {
-    await emitKilledEvent(prisma, gameId, day, investigateAction.userId);
+    await emitKilledEvent(
+      prisma,
+      game.id,
+      game.day,
+      investigateAction.userId,
+      investigateAction.id
+    );
+    // TODO: Separate into resolve DEATH event
     await applyDeath(prisma, killAction.targetId);
   }
 
-  await emitKilledEvent(prisma, gameId, day, killAction.targetId);
+  await emitKilledEvent(
+    prisma,
+    game.id,
+    game.day,
+    killAction.targetId,
+    killAction.id
+  );
   await applyDeath(prisma, killAction.targetId);
 };
 
 export const resolveInvestigation = async (
   prisma: PrismaClient,
-  gameId: number,
-  day: number
+  game: Game
 ) => {
   const investigateAction = await prisma.actions.findUnique({
     where: {
       day_gameId_type: {
-        gameId,
-        day,
+        gameId: game.id,
+        day: game.day,
         type: ActionTypes.INVESTIGATE,
       },
     },
@@ -78,7 +102,13 @@ export const resolveInvestigation = async (
     return; // No investigation or investigator is dead
   }
 
-  await emitInvestigatedEvent(prisma, gameId, day, investigateAction.targetId);
+  return emitInvestigatedEvent(
+    prisma,
+    game.id,
+    game.day,
+    investigateAction.targetId,
+    investigateAction.targetId
+  );
 };
 
 export const emitKillAction = async (

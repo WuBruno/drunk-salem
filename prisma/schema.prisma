@@ -22,9 +22,10 @@ model User {
     targetVotes Votes[] @relation("target")
     userMoves Actions[] @relation("moveUser")
     targetMoves Actions[] @relation("moveTarget")
+    drinks Drinks[]
     events Events[]
-    role Roles? @relation(fields: [roleId], references: [role])
-    roleId Role?
+    role Roles @relation(fields: [roleId], references: [role])
+    roleId Role @default(UNASSIGNED)
     @@unique([username, gameId])
     @@index([gameId])
     @@index([roleId])
@@ -42,11 +43,13 @@ enum Role {
     DETECTIVE
     DOCTOR
     TOWNSPERSON
+    UNASSIGNED
 }
 
 enum Team {
     MAFIA
     TOWN
+    UNASSIGNED
 }
 
 enum GameState {
@@ -72,6 +75,7 @@ model Game {
     stage DayStage @default(DAY) // DAY, VOTING, NIGHT
     votes Votes[]
     events Events[]
+    drinks Drinks[]
 }
 
 model Votes {
@@ -92,6 +96,7 @@ enum EventType {
     HUNG
     ANNOUNCEMENT
     INVESTIGATED
+    SAVED
 }
 
 model Events {
@@ -104,8 +109,12 @@ model Events {
     target User? @relation(fields: [targetId], references: [id])
     type EventType
     description String
+    drinkId Int?
+    drink Drinks? @relation(fields: [drinkId], references: [id])
+    actions Actions[]
     @@index([gameId])
     @@index([targetId])
+    @@index([drinkId])
 }
 
 
@@ -124,9 +133,28 @@ model Actions {
     user User @relation("moveUser", fields: [userId], references: [id])
     targetId Int
     target User @relation("moveTarget", fields: [targetId], references: [id])
+    eventId Int?
+    event Events? @relation(fields: [eventId], references: [id])
     type ActionTypes
     @@unique([day, gameId, type])
     @@index([gameId])
     @@index([targetId])
     @@index([userId])
+    @@index([eventId])
+}
+
+model Drinks {
+    id Int @id @default(autoincrement())
+    game Game @relation(fields: [gameId], references: [id])
+    gameId Int
+    day Int
+    stage DayStage
+    targetId Int
+    target User @relation(fields: [targetId], references: [id])
+    amount Int @default(0)
+    events Events[]
+
+    @@unique([day, stage, gameId, targetId])
+    @@index([gameId])
+    @@index([targetId])
 }

@@ -5,7 +5,8 @@ export const emitKilledEvent = async (
   prisma: PrismaClient,
   gameId: number,
   day: number,
-  userId: number
+  userId: number,
+  actionId: number
 ) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
@@ -13,7 +14,7 @@ export const emitKilledEvent = async (
     },
   });
 
-  return prisma.events.create({
+  const event = await prisma.events.create({
     data: {
       gameId,
       day,
@@ -23,9 +24,11 @@ export const emitKilledEvent = async (
       type: EventType.KILLED,
     },
   });
+
+  return connectActionToEvent(prisma, event.id, [actionId]);
 };
 
-export const emitHangedEvent = async (
+export const emitHungEvent = async (
   prisma: PrismaClient,
   gameId: number,
   day: number,
@@ -69,7 +72,8 @@ export const emitInvestigatedEvent = async (
   prisma: PrismaClient,
   gameId: number,
   day: number,
-  userId: number
+  userId: number,
+  actionId: number
 ) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
@@ -84,7 +88,7 @@ export const emitInvestigatedEvent = async (
     throw new TRPCClientError("User has no role");
   }
 
-  return prisma.events.create({
+  const event = await prisma.events.create({
     data: {
       gameId,
       day,
@@ -94,4 +98,60 @@ export const emitInvestigatedEvent = async (
       type: EventType.INVESTIGATED,
     },
   });
+
+  return connectActionToEvent(prisma, event.id, [actionId]);
+};
+
+const connectActionToEvent = async (
+  prisma: PrismaClient,
+  eventId: number,
+  actionId: number[]
+) => {
+  return Promise.all(
+    actionId.map((id) => {
+      return prisma.actions.update({
+        where: {
+          id,
+        },
+        data: {
+          eventId,
+        },
+      });
+    })
+  );
+};
+
+export const emitSavedEvent = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number,
+  userId: number,
+  healActionId: number,
+  killActionId: number
+) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+    },
+    include: {
+      role: true,
+    },
+  });
+
+  if (!user.role?.team) {
+    throw new TRPCClientError("User has no role");
+  }
+
+  const event = await prisma.events.create({
+    data: {
+      gameId,
+      day,
+      stage: DayStage.NIGHT,
+      description: `${user.username} was saved last night`,
+      targetId: user.id,
+      type: EventType.SAVED,
+    },
+  });
+
+  return connectActionToEvent(prisma, event.id, [healActionId, killActionId]);
 };
