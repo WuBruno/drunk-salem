@@ -4,7 +4,6 @@ import { type NextPage } from "next";
 import { useStore } from "zustand";
 import GameStatus from "../components/GameStatus";
 import VoteUser from "../components/VoteUser";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
   CardHeader,
@@ -19,6 +18,7 @@ import DoctorForm from "@/components/Doctor";
 import DetectiveForm from "@/components/Detective";
 import DrinksHistory from "@/components/DrinksHistory";
 import AdminSigninForm from "@/components/AdminSigninForm";
+import ActionsHistory from "@/components/ActionsHistory";
 
 const Admin: NextPage = () => {
   const store = useStore(useAuthStore, (state) => state);
@@ -52,12 +52,13 @@ const Admin: NextPage = () => {
           {user.data?.roleId === Role.DOCTOR && <DoctorForm />}
           {user.data?.roleId === Role.DETECTIVE && <DetectiveForm />}
           <EventHistory />
+          <ActionsHistory />
           <DrinksHistory />
           <VoteHistory />
         </>
       ) : (
         <>
-          <AdminSigninForm onSubmit={() => {}} />
+          <AdminSigninForm />
         </>
       )}
     </div>

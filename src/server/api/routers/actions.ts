@@ -12,6 +12,19 @@ import { ActionTypes } from "@prisma/client";
 import { z } from "zod";
 
 export const actionsRouter = createTRPCRouter({
+  all: publicProcedure
+    .input(z.object({ gameId: z.number() }))
+    .query(async ({ ctx, input }) =>
+      ctx.prisma.actions.findMany({
+        where: {
+          gameId: input.gameId,
+        },
+        include: {
+          target: true,
+          user: true,
+        },
+      })
+    ),
   getKill: publicProcedure
     .input(z.object({ gameId: z.number() }))
     .query(async ({ ctx, input }) => {
