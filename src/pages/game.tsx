@@ -7,7 +7,7 @@ import VoteUser from "../components/VoteUser";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import VoteHistory from "../components/VoteHistory";
 import MafiaTargetForm from "@/components/MafiaKill";
-import { DayStage, Role } from "@prisma/client";
+import { DayStage, Role, Team } from "@prisma/client";
 import DoctorForm from "@/components/Doctor";
 import DetectiveForm from "@/components/Detective";
 import DrinksHistory from "@/components/DrinksHistory";
@@ -35,7 +35,7 @@ const Game: NextPage = () => {
           <PublicPlayers />
           <Roles />
           {game.data?.stage !== DayStage.NIGHT && <VoteUser />}
-          {user.data?.roleId === Role.MAFIA_KILLING && <MafiaTargetForm />}
+          {user.data?.role.team === Team.MAFIA && <MafiaTargetForm />}
           {user.data?.roleId === Role.DOCTOR && <DoctorForm />}
           {user.data?.roleId === Role.DETECTIVE && <DetectiveForm />}
           <PublicEventHistory />

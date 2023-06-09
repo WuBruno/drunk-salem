@@ -39,6 +39,16 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+  mafias: publicProcedure.input(z.number()).query(async ({ input, ctx }) =>
+    ctx.prisma.user.findMany({
+      where: {
+        gameId: input,
+        role: {
+          team: Team.MAFIA,
+        },
+      },
+    })
+  ),
   teams: publicProcedure.input(z.number()).query(async ({ input, ctx }) => {
     const town = await ctx.prisma.user.count({
       where: {

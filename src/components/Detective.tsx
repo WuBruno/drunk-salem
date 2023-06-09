@@ -1,19 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -22,9 +14,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 import { useAuthStore } from "@/store";
-import { useStore } from "zustand";
 import { api } from "@/utils/api";
+import { useStore } from "zustand";
 
 const FormSchema = z.object({
   target: z.string(),
@@ -36,6 +36,7 @@ function Investigator() {
   const myInvestigation = api.actions.getInvestigate.useQuery({
     gameId: store?.gameId || 0,
   });
+
   const { mutate: investigate } = api.actions.investigate.useMutation({
     onError: (err) =>
       toast({
@@ -133,6 +134,11 @@ function Investigator() {
 }
 
 const DetectiveForm = () => {
+  const store = useStore(useAuthStore, (state) => state);
+  const { data: results } = api.actions.getInvestigationResults.useQuery({
+    gameId: store?.gameId || 0,
+  });
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
@@ -140,6 +146,11 @@ const DetectiveForm = () => {
       </CardHeader>
       <CardContent className="grid gap-4">
         <Investigator />
+        {results?.map((result) => (
+          <div key={result.id}>
+            <p className="text-lg">{result.description}</p>
+          </div>
+        ))}
       </CardContent>
     </Card>
   );

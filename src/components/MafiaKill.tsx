@@ -25,6 +25,8 @@ import {
 import { useAuthStore } from "@/store";
 import { useStore } from "zustand";
 import { api } from "@/utils/api";
+import { Separator } from "./ui/separator";
+import { Role } from "@prisma/client";
 
 const FormSchema = z.object({
   target: z.string(),
@@ -130,13 +132,23 @@ function MafiaTarget() {
 }
 
 const MafiaTargetForm = () => {
+  const store = useStore(useAuthStore, (state) => state);
+  const mafiaUsers = api.user.mafias.useQuery(store?.gameId || 0);
+  const { data: user } = api.user.user.useQuery(store?.userId || 0);
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>Mafia Choose To Kill</CardTitle>
+        <CardTitle>Mafia</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <MafiaTarget />
+        {mafiaUsers.data?.map((user) => (
+          <p key={user.id}>
+            {user.username} - {user.roleId}
+          </p>
+        ))}
+        <Separator />
+        {user?.roleId === Role.MAFIA_KILLING && <MafiaTarget />}
       </CardContent>
     </Card>
   );

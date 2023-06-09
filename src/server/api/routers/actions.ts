@@ -8,7 +8,7 @@ import {
   removeKillAction,
 } from "@/server/service/actions";
 import { getActiveGame } from "@/server/service/game";
-import { ActionTypes } from "@prisma/client";
+import { ActionTypes, EventType } from "@prisma/client";
 import { z } from "zod";
 
 export const actionsRouter = createTRPCRouter({
@@ -144,6 +144,16 @@ export const actionsRouter = createTRPCRouter({
         },
       });
     }),
+  getInvestigationResults: publicProcedure
+    .input(z.object({ gameId: z.number() }))
+    .query(async ({ ctx, input }) =>
+      ctx.prisma.events.findMany({
+        where: {
+          gameId: input.gameId,
+          type: EventType.INVESTIGATED,
+        },
+      })
+    ),
   removeInvestigate: publicProcedure
     .input(
       z.object({
