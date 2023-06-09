@@ -86,7 +86,10 @@ export const resolveKilled = async (prisma: PrismaClient, game: Game) => {
   });
 
   // Also kill investigator if they investigated the killed
-  if (investigateAction?.targetId === killAction.targetId) {
+  if (
+    investigateAction?.targetId === killAction.targetId &&
+    heal?.targetId !== killAction.targetId
+  ) {
     await emitKilledEvent(
       prisma,
       game.id,
@@ -94,7 +97,6 @@ export const resolveKilled = async (prisma: PrismaClient, game: Game) => {
       investigateAction.userId,
       investigateAction.id
     );
-    // TODO: Separate into resolve DEATH event
     await applyDeath(prisma, killAction.targetId);
   }
 
