@@ -4,12 +4,22 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  return prisma.$transaction([
-    prisma.roles.deleteMany(),
-    prisma.roles.createMany({
-      data: Array.from(roles.entries(), ([role, team]) => ({ role, team })),
-    }),
-  ]);
+  return prisma.$transaction(
+    Array.from(roles.entries()).map(([role, team]) =>
+      prisma.roles.upsert({
+        where: {
+          role,
+        },
+        create: {
+          role,
+          team,
+        },
+        update: {
+          team,
+        },
+      })
+    )
+  );
 }
 
 main()

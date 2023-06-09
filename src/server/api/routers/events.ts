@@ -18,7 +18,7 @@ export const eventsRouter = createTRPCRouter({
       where: {
         gameId: input,
         type: {
-          not: EventType.INVESTIGATED,
+          notIn: [EventType.INVESTIGATED, EventType.DRUNKARD_DRINK],
         },
       },
       orderBy: {

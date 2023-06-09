@@ -3,10 +3,10 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 const initialState: State = {
-  username: "",
-  userId: 0,
-  gameId: 0,
-  gameCode: 0,
+  username: undefined,
+  userId: undefined,
+  gameId: undefined,
+  gameCode: undefined,
   isAdmin: false,
 };
 

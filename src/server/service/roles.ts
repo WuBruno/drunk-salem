@@ -13,6 +13,7 @@ const MAFIA_RATIO = 1 / 4;
 const TOWN_ACTIVE_ROLES = {
   [Role.DETECTIVE]: 1,
   [Role.DOCTOR]: 1,
+  [Role.DRUNKARD]: 1,
 };
 const townActiveTotal = Object.values(TOWN_ACTIVE_ROLES).reduce(
   (acc, curr) => acc + curr,

@@ -5,11 +5,39 @@ import {
   type Game,
 } from "@prisma/client";
 import {
+  emitDrunkardDrinkEvent,
   emitInvestigatedEvent,
   emitKilledEvent,
   emitSavedEvent,
 } from "./events";
 import { applyDeath } from "./user";
+
+export const resolveDrunkardDrink = async (
+  prisma: PrismaClient,
+  game: Game
+) => {
+  const drunkardDrinkAction = await prisma.actions.findUnique({
+    where: {
+      day_gameId_type: {
+        gameId: game.id,
+        day: game.day,
+        type: ActionTypes.DRUNKARD_DRINK,
+      },
+    },
+  });
+
+  if (!drunkardDrinkAction) {
+    return;
+  }
+
+  return emitDrunkardDrinkEvent(
+    prisma,
+    game.id,
+    game.day,
+    drunkardDrinkAction.userId,
+    drunkardDrinkAction.id
+  );
+};
 
 export const resolveKilled = async (prisma: PrismaClient, game: Game) => {
   const killAction = await prisma.actions.findUnique({
@@ -235,6 +263,49 @@ export const removeInvestigateAction = async (
         day,
         gameId,
         type: ActionTypes.INVESTIGATE,
+      },
+    },
+  });
+
+export const emitDrunkardDrinkAction = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number,
+  userId: number,
+  targetId: number
+) =>
+  prisma.actions.upsert({
+    where: {
+      day_gameId_type: {
+        day,
+        gameId,
+        type: ActionTypes.DRUNKARD_DRINK,
+      },
+    },
+    create: {
+      userId,
+      day,
+      gameId,
+      type: ActionTypes.DRUNKARD_DRINK,
+      stage: DayStage.NIGHT,
+      targetId,
+    },
+    update: {
+      targetId,
+    },
+  });
+
+export const removeDrunkardDrinkAction = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number
+) =>
+  prisma.actions.delete({
+    where: {
+      day_gameId_type: {
+        day,
+        gameId,
+        type: ActionTypes.DRUNKARD_DRINK,
       },
     },
   });

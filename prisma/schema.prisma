@@ -43,6 +43,7 @@ enum Role {
     DETECTIVE
     DOCTOR
     TOWNSPERSON
+    DRUNKARD
     UNASSIGNED
 }
 
@@ -104,6 +105,7 @@ enum EventType {
     ANNOUNCEMENT
     INVESTIGATED
     SAVED
+    DRUNKARD_DRINK
 }
 
 model Events {
@@ -129,6 +131,7 @@ enum ActionTypes {
     KILL
     HEAL
     INVESTIGATE
+    DRUNKARD_DRINK
 }
 model Actions {
     id Int @id @default(autoincrement())

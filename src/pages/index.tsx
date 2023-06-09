@@ -100,7 +100,7 @@ const Home: NextPage = () => {
       ) : (
         <p>Joined game: {store.gameCode}</p>
       )}
-      {store?.gameId &&
+      {(store?.gameId &&
         (!store.userId ? (
           <div className="flex flex-col gap-5">
             {game.data?.state === GameState.LOBBY && (
@@ -135,8 +135,8 @@ const Home: NextPage = () => {
           </div>
         ) : (
           <p>Signed in as: {store?.username}</p>
-        ))}
-      {store?.gameId && store?.userId && (
+        ))) || <></>}
+      {(store?.gameId && store?.userId && (
         <>
           <UserList gameId={store.gameId} />
           <div className="flex gap-3">
@@ -152,7 +152,7 @@ const Home: NextPage = () => {
             </Button>
           </div>
         </>
-      )}
+      )) || <></>}
     </div>
   );
 };

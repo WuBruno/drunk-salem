@@ -14,6 +14,7 @@ import DrinksHistory from "@/components/DrinksHistory";
 import PublicEventHistory from "@/components/PublicEventHistory";
 import PublicPlayers from "@/components/PublicPlayers";
 import Roles from "@/components/Roles";
+import Drunkard from "@/components/Drunkard";
 
 const Game: NextPage = () => {
   const store = useStore(useAuthStore, (state) => state);
@@ -38,6 +39,7 @@ const Game: NextPage = () => {
           {user.data?.role.team === Team.MAFIA && <MafiaTargetForm />}
           {user.data?.roleId === Role.DOCTOR && <DoctorForm />}
           {user.data?.roleId === Role.DETECTIVE && <DetectiveForm />}
+          {user.data?.roleId === Role.DRUNKARD && <Drunkard />}
           <PublicEventHistory />
           <DrinksHistory />
         </TabsContent>

@@ -6,6 +6,33 @@ import {
 } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
 
+export const emitDrunkardDrinkEvent = async (
+  prisma: PrismaClient,
+  gameId: number,
+  day: number,
+  userId: number,
+  actionId: number
+) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
+  const event = await prisma.events.create({
+    data: {
+      gameId,
+      day,
+      stage: DayStage.NIGHT,
+      description: `${user.username} was drunk`,
+      targetId: user.id,
+      type: EventType.DRUNKARD_DRINK,
+    },
+  });
+
+  return connectActionToEvent(prisma, event.id, [actionId]);
+};
+
 export const emitKilledEvent = async (
   prisma: PrismaClient,
   gameId: number,

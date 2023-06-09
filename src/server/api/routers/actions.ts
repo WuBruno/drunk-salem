@@ -1,8 +1,10 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import {
+  emitDrunkardDrinkAction,
   emitHealAction,
   emitInvestigateAction,
   emitKillAction,
+  removeDrunkardDrinkAction,
   removeHealAction,
   removeInvestigateAction,
   removeKillAction,
@@ -163,5 +165,48 @@ export const actionsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const game = await getActiveGame(ctx.prisma, input.gameId);
       await removeInvestigateAction(ctx.prisma, input.gameId, game.day);
+    }),
+  drunkardDrink: publicProcedure
+    .input(
+      z.object({
+        gameId: z.number(),
+        userId: z.number(),
+        targetId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const game = await getActiveGame(ctx.prisma, input.gameId);
+      await emitDrunkardDrinkAction(
+        ctx.prisma,
+        input.gameId,
+        game.day,
+        input.userId,
+        input.targetId
+      );
+    }),
+  getDrunkardDrink: publicProcedure
+    .input(z.object({ gameId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const game = await getActiveGame(ctx.prisma, input.gameId);
+
+      return ctx.prisma.actions.findUnique({
+        where: {
+          day_gameId_type: {
+            day: game.day,
+            gameId: input.gameId,
+            type: ActionTypes.DRUNKARD_DRINK,
+          },
+        },
+      });
+    }),
+  removeDrunkardDrink: publicProcedure
+    .input(
+      z.object({
+        gameId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const game = await getActiveGame(ctx.prisma, input.gameId);
+      await removeDrunkardDrinkAction(ctx.prisma, input.gameId, game.day);
     }),
 });
