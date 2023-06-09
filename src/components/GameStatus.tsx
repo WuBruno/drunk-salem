@@ -41,6 +41,12 @@ const GameStatus = () => {
         <div className="text-1xl">
           Username: <b>{user?.username}</b>
         </div>
+        <div className="text-1xl">
+          Role:{" "}
+          <b>
+            {user?.role.role} - {user?.role.team}
+          </b>
+        </div>
         {store.isAdmin && (
           <Button
             onClick={() => processNextStage({ gameId: game.data?.id || 0 })}

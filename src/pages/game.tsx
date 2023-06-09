@@ -5,12 +5,6 @@ import { useStore } from "zustand";
 import GameStatus from "../components/GameStatus";
 import VoteUser from "../components/VoteUser";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../components/ui/card";
 import VoteHistory from "../components/VoteHistory";
 import MafiaTargetForm from "@/components/MafiaKill";
 import { DayStage, Role } from "@prisma/client";
@@ -18,10 +12,11 @@ import DoctorForm from "@/components/Doctor";
 import DetectiveForm from "@/components/Detective";
 import DrinksHistory from "@/components/DrinksHistory";
 import PublicEventHistory from "@/components/PublicEventHistory";
+import PublicPlayers from "@/components/PublicPlayers";
+import Roles from "@/components/Roles";
 
-const Main: NextPage = () => {
+const Game: NextPage = () => {
   const store = useStore(useAuthStore, (state) => state);
-  const users = api.user.alive.useQuery(store?.gameId || 0);
   const user = api.user.user.useQuery(store?.userId || 0);
   const game = api.game.one.useQuery(store?.gameId || 0);
 
@@ -33,22 +28,12 @@ const Main: NextPage = () => {
       <Tabs defaultValue="current" className="w-[350px]">
         <TabsList className="mb-7 grid w-full grid-cols-2">
           <TabsTrigger value="current">Current</TabsTrigger>
-          <TabsTrigger value="votes">History</TabsTrigger>
+          <TabsTrigger value="votes">Votes</TabsTrigger>
         </TabsList>
         <TabsContent value="current" className="flex flex-col gap-7">
           <GameStatus />
-          <Card className="w-[350px]">
-            <CardHeader>
-              <CardTitle>Players Alive</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              {users.data?.map((user) => (
-                <p key={user.id}>
-                  {user.username} - {user.roleId?.toLowerCase()}
-                </p>
-              ))}
-            </CardContent>
-          </Card>
+          <PublicPlayers />
+          <Roles />
           {game.data?.stage !== DayStage.NIGHT && <VoteUser />}
           {user.data?.roleId === Role.MAFIA_KILLING && <MafiaTargetForm />}
           {user.data?.roleId === Role.DOCTOR && <DoctorForm />}
@@ -64,4 +49,4 @@ const Main: NextPage = () => {
   );
 };
 
-export default Main;
+export default Game;
