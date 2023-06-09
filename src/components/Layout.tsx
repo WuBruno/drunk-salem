@@ -10,12 +10,12 @@ export default function RootLayout({
   return (
     <>
       <Head>
-        <title>Drunk Salem</title>
+        <title>Drunk Mafia</title>
         <meta name="description" content="Drunk Salem Game" />
       </Head>
       <Navbar />
       <Toaster />
-      <main className="flex min-h-screen flex-col items-center justify-center">
+      <main className="flex min-h-screen flex-col items-center">
         {children}
       </main>
     </>

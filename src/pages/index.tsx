@@ -74,7 +74,7 @@ const Home: NextPage = () => {
   return (
     <div className="container flex flex-col items-center justify-center gap-4 px-4 py-16 ">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        Drunk Salem
+        Drunk Mafia
       </h1>
       {!store?.gameId ? (
         <div className="flex flex-col gap-2">

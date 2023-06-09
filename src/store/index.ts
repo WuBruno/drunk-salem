@@ -3,10 +3,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 const initialState: State = {
-  username: undefined,
-  userId: undefined,
-  gameId: undefined,
-  gameCode: undefined,
+  username: "",
+  userId: 0,
+  gameId: 0,
+  gameCode: 0,
+  isAdmin: false,
 };
 
 type State = {
@@ -14,12 +15,14 @@ type State = {
   userId?: number;
   gameId?: number;
   gameCode?: number;
+  isAdmin?: boolean;
 };
 
 type Actions = {
   signIn: (username: string, userId: number) => void;
   joinGame: (gameId: number, gameCode: number) => void;
   signOut: () => void;
+  joinAsAdmin: () => void;
 };
 
 export const useAuthStore = create<State & Actions>()(
@@ -27,7 +30,12 @@ export const useAuthStore = create<State & Actions>()(
     (set) => ({
       signIn: (username, userId) => set({ username, userId }),
       joinGame: (gameId, gameCode) => set({ gameId, gameCode }),
-      signOut: () => set(initialState),
+      signOut: () =>
+        set(({ isAdmin }) => ({
+          ...initialState,
+          isAdmin,
+        })),
+      joinAsAdmin: () => set({ isAdmin: true }),
     }),
     { name: "user-storage" }
   )

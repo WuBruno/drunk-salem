@@ -8,6 +8,7 @@ import { toast } from "./ui/use-toast";
 const GameStatus = () => {
   const store = useStore(useAuthStore, (state) => state);
   const game = api.game.one.useQuery(store?.gameId || 0);
+  const { data: user } = api.user.user.useQuery(store?.userId || 0);
   const ctx = api.useContext();
   const { mutate: processNextStage } = api.game.processNextStage.useMutation({
     onSuccess: async () => {
@@ -37,11 +38,16 @@ const GameStatus = () => {
         <div className="text-1xl">
           Code: <b>{game.data?.code}</b>
         </div>
-        <Button
-          onClick={() => processNextStage({ gameId: game.data?.id || 0 })}
-        >
-          Next Stage
-        </Button>
+        <div className="text-1xl">
+          Username: <b>{user?.username}</b>
+        </div>
+        {store.isAdmin && (
+          <Button
+            onClick={() => processNextStage({ gameId: game.data?.id || 0 })}
+          >
+            Next Stage
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
