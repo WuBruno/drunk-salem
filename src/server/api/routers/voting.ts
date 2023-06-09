@@ -2,9 +2,22 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { getActiveGame } from "@/server/service/game";
 import { TRPCError } from "@trpc/server";
-import { DayStage } from "@prisma/client";
+import { DayStage, EventType } from "@prisma/client";
 
 export const votingRouter = createTRPCRouter({
+  getVoteResult: publicProcedure
+    .input(z.object({ gameId: z.number(), day: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.prisma.events.findFirst({
+        where: {
+          gameId: input.gameId,
+          day: input.day,
+          type: {
+            in: [EventType.HUNG, EventType.NOHUNG],
+          },
+        },
+      });
+    }),
   getVotesByDay: publicProcedure
     .input(z.object({ gameId: z.number(), day: z.number() }))
     .query(({ ctx, input }) =>

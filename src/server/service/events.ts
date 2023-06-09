@@ -2,7 +2,6 @@ import {
   DayStage,
   EventType,
   type Game,
-  type GameOutcome,
   type PrismaClient,
 } from "@prisma/client";
 import { TRPCClientError } from "@trpc/client";
@@ -68,7 +67,7 @@ export const emitNoHang = async (
       gameId,
       day,
       stage: DayStage.VOTING,
-      type: EventType.ANNOUNCEMENT,
+      type: EventType.NOHUNG,
       description: `No one was hanged`,
     },
   });
@@ -99,7 +98,7 @@ export const emitInvestigatedEvent = async (
       gameId,
       day,
       stage: DayStage.NIGHT,
-      description: `${user.username} was investigated, they are part of ${user.role?.team}`,
+      description: `${user.username} is a ${user.role?.team} member`,
       targetId: user.id,
       type: EventType.INVESTIGATED,
     },
@@ -153,7 +152,7 @@ export const emitSavedEvent = async (
       gameId,
       day,
       stage: DayStage.NIGHT,
-      description: `${user.username} was saved last night`,
+      description: `${user.username} was saved`,
       targetId: user.id,
       type: EventType.SAVED,
     },

@@ -16,10 +16,15 @@ import {
   TableBody,
   TableCell,
 } from "./ui/table";
+import { DayStage } from "@prisma/client";
 
 const VoteHistoryDay = ({ day }: { day: number }) => {
   const store = useStore(useAuthStore, (state) => state);
   const userVotes = api.vote.getVotesByDay.useQuery({
+    gameId: store?.gameId || 0,
+    day,
+  });
+  const { data: hungEvent } = api.vote.getVoteResult.useQuery({
     gameId: store?.gameId || 0,
     day,
   });
@@ -28,6 +33,9 @@ const VoteHistoryDay = ({ day }: { day: number }) => {
     <AccordionItem value={day.toString()}>
       <AccordionTrigger>Day {day}</AccordionTrigger>
       <AccordionContent>
+        <div>
+          <span className="font-bold">Outcome:</span> {hungEvent?.description}
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -65,9 +73,15 @@ const VoteHistory = () => {
       <CardContent className="grid gap-4">
         <Accordion type="single" collapsible>
           {game.data?.day &&
-            Array.from({ length: game.data?.day - 1 }, (_, i) => i + 1).map(
-              (day) => <VoteHistoryDay key={day} day={day} />
-            )}
+            Array.from(
+              {
+                length:
+                  game.data?.day - (game.data.stage === DayStage.NIGHT ? 0 : 1),
+              },
+              (_, i) => i + 1
+            )
+              .reverse()
+              .map((day) => <VoteHistoryDay key={day} day={day} />)}
         </Accordion>
       </CardContent>
     </Card>

@@ -42,8 +42,8 @@ export const processVotes = async (
 
   const highestVote = highestVotes.at(0);
   if (!highestVote) {
-    // No particular votes won
-    return;
+    // No votes were carried out
+    return emitNoHang(prisma, gameId, day);
   }
 
   const highestVoteCount = highestVote._count.targetId;
